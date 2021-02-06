@@ -1,0 +1,38 @@
+{
+  "name": "boatbutler-backend",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "dev": "ts-node-dev src/app.ts",
+    "start": "tsc && node dist/app.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/adelin007/boatbutler-backend.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/adelin007/boatbutler-backend/issues"
+  },
+  "homepage": "https://github.com/adelin007/boatbutler-backend#readme",
+  "dependencies": {
+    "@types/mongoose": "^5.10.3",
+    "body-parser": "^1.19.0",
+    "cors": "^2.8.5",
+    "dotenv": "^8.2.0",
+    "express": "^4.16.4",
+    "joi": "^17.3.0",
+    "mongoose": "^5.11.8",
+    "nodemon": "^2.0.6",
+    "typescript": "~4.0.5"
+  },
+  "devDependencies": {
+    "@types/express": "^4.17.9",
+    "@types/joi": "^17.2.3",
+    "ts-node-dev": "^1.1.1",
+    "tslint": "^5.12.1"
+  }
+}
