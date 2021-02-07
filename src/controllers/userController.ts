@@ -1,7 +1,7 @@
 import { Request, Response } from 'express';
 import bodyParser from "body-parser";
 import { createNewUser, getAllUsers, createJWToken, createNewCompanyForUser } from "../services/userService";
-import {BCRYPT_HASH_ROUND} from "../utils/definitions";
+import { BCRYPT_HASH_ROUND } from "../utils/definitions";
 import { UserInterface } from "../models/User";
 import Joi from 'joi';
 import bcrypt from "bcrypt";
@@ -22,7 +22,7 @@ export interface CreateNewUserInput {
     // updated_at: UserInterface['updated_at'];
     // active: UserInterface['active']; 
 }
-export interface CreateNewUserCompanyInput{
+export interface CreateNewUserCompanyInput {
     name: CompanyInterface['name'];
     lat: CompanyInterface['lat'];
     lng: CompanyInterface['lng'];
@@ -61,19 +61,17 @@ const createNewUserCompanyValidationSchema = Joi.object().keys({
     logo_image_url: Joi.string(),
     cvr: Joi.string().exist()
 });
-
-interface UserLoginCredentials extends Request{
+interface UserLoginCredentials extends Request {
     body: {
         email: string;
         password: string;
     }
-    
-}
 
-interface GetUserDetailsRequest extends Request{
+}
+interface GetUserDetailsRequest extends Request {
     user: UserInterface;
 }
-interface GetUserDetailsResponse{
+interface GetUserDetailsResponse {
     profile_pic: UserInterface['profile_pic'];
     user_role: UserInterface['user_role'];
     name: UserInterface['name'];
@@ -82,6 +80,7 @@ interface GetUserDetailsResponse{
     address: UserInterface['address'];
     zip_code: UserInterface['zip_code'];
     city: UserInterface['city'];
+    company: UserInterface['company']
 }
 
 export const postNewUser = async (req: CreateNewUserRequest, res: Response) => {
@@ -90,14 +89,14 @@ export const postNewUser = async (req: CreateNewUserRequest, res: Response) => {
         const errors = result.error;
         if (errors) {
             throw new Error(errors.message);
-        } 
+        }
         const newUserDetails = req.body;
         if (!newUserDetails) {
             throw new Error("Invalid new user details");
         }
         // hash password
         newUserDetails.password = await bcrypt.hash(newUserDetails.password, BCRYPT_HASH_ROUND);
-        const savedUser = await createNewUser({ ...newUserDetails, active: true, created_at: "", updated_at: ""});
+        const savedUser = await createNewUser({ ...newUserDetails, active: true, created_at: "", updated_at: "" });
         if (!savedUser) {
             throw new Error("Could not save User");
         }
@@ -109,7 +108,6 @@ export const postNewUser = async (req: CreateNewUserRequest, res: Response) => {
 
     }
 
-
 }
 
 export const postNewUserCompany = async (req: CreateNewUserCompanyRequest, res: Response) => {
@@ -118,13 +116,13 @@ export const postNewUserCompany = async (req: CreateNewUserCompanyRequest, res: 
         const errors = result.error;
         if (errors) {
             throw new Error(errors.message);
-        } 
+        }
         const newUserCompanyDetails = req.body;
         if (!newUserCompanyDetails || !req.user) {
             throw new Error("Invalid new user details");
         }
         const userId = req.user.id;
-        await createNewCompanyForUser({...newUserCompanyDetails, is_enabled: true, is_paid: true, is_visible: true, user_id: userId});
+        await createNewCompanyForUser({ ...newUserCompanyDetails, is_enabled: true, is_paid: true, is_visible: true, user_id: userId });
         res.sendStatus(200);
 
     } catch (err) {
@@ -136,26 +134,24 @@ export const postNewUserCompany = async (req: CreateNewUserCompanyRequest, res: 
 
 }
 
-
-
-export const postUserLoginDetails = async(req: UserLoginCredentials, res: Response) => {
-    try{
-        const {email, password} = req.body;
+export const postUserLoginDetails = async (req: UserLoginCredentials, res: Response) => {
+    try {
+        const { email, password } = req.body;
         const jwToken = await createJWToken(email, password);
-        if(!jwToken){
+        if (!jwToken) {
             throw new Error("Could not create JWT");
         }
-        res.send({token: jwToken});
-    }catch(err){
+        res.send({ token: jwToken });
+    } catch (err) {
         console.log(err);
         res.status(400).send(err);
     }
 }
 
-export const getUserDetails = async(req: GetUserDetailsRequest, res: Response) => {
-    try{
+export const getUserDetails = async (req: GetUserDetailsRequest, res: Response) => {
+    try {
         const user = req.user;
-        if(!user){
+        if (!user) {
             throw new Error("User not found!")
         }
         const response: GetUserDetailsResponse = {
@@ -166,20 +162,21 @@ export const getUserDetails = async(req: GetUserDetailsRequest, res: Response) =
             phone_number: user.phone_number,
             address: user.address,
             zip_code: user.zip_code,
-            city: user.city
+            city: user.city,
+            company: user.company
         };
         return res.send(response);
-    }catch(err){
+    } catch (err) {
 
     }
 }
 
 
-export const getUsers = async(req: Request, res: Response) => {
-    try{
+export const getUsers = async (req: Request, res: Response) => {
+    try {
         const users = await getAllUsers();
         res.send(users);
-    } catch(err){
+    } catch (err) {
         console.log(err);
         res.status(400).send(err);
     }

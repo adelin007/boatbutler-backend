@@ -64,7 +64,8 @@ export const getUserById = async(userId: string) => {
 export const getCompanyUserById = async(companyUserId: string) => {
     try{
         const objId = mongoose.Types.ObjectId(companyUserId);
-        const userWithCompany = await User.findById(objId).populate('Company');
+        const userWithCompany = await User.findById(objId).populate('company');
+        console.log("USER WITH COMPANY: ", userWithCompany);
         if(!userWithCompany){
             throw new Error("User with company could not be found");
         }
