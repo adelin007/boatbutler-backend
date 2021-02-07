@@ -3,8 +3,9 @@ import bodyParser from "body-parser"
 import cors from "cors";
 import mongoose, {model, Document} from 'mongoose';
 import * as dotenv from "dotenv";
-
+import passport from "passport";
 import {router} from "./routes";
+import "./config/passport";
 
 dotenv.config();
 
@@ -17,6 +18,8 @@ mongoose.connect(MONGO_DB_URL, {useNewUrlParser: true, useUnifiedTopology: true}
 const app = express();
 app.use(cors());
 app.use(bodyParser.json());
+app.use(bodyParser.urlencoded({ extended: true }));
+app.use(passport.initialize());
 app.use(function (err: Error, req: Request, res: Response, next: NextFunction) {
     console.error(err.stack);
     res.status(500).send('Something broke!')
