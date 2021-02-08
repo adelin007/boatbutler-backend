@@ -23,7 +23,6 @@ const BoatSchema = new mongoose.Schema({
     city: String,
     description: String
     
-    
 }, {timestamps: {createdAt: 'created_at', updatedAt: "updated_at"}});
 
 export interface BoatInterface extends Document{

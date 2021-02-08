@@ -5,6 +5,9 @@ import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 import { JWT_SECRET } from "../utils/definitions";
 import { Company, CompanyInterface } from "../models/Company";
+import {Job, JobInterface} from "../models/Job";
+import {Boat, BoatInterface} from "../models/Boat";
+import {JobInvite, JobInviteInterface} from "../models/JobInvite"
 
 
 
@@ -116,4 +119,33 @@ export const createJWToken = async(email: string, password: string) => {
         throw new Error(err);
     }
     
+}
+
+export const addBoat = async(boat: CreateQuery<BoatInterface>) => {
+    try{
+        return await Boat.create(boat);
+    } catch(err){
+        throw new Error(err);
+    }
+   
+
+}
+
+
+export const createJob = async(job: CreateQuery<JobInterface>) => {
+    try{
+        return await Job.create(job);
+    } catch(err){
+        throw new Error(err);
+    }
+   
+}
+
+export const createJobInvite= async(jobInvite: CreateQuery<JobInviteInterface>) => {
+    try{
+        return await JobInvite.create(jobInvite);
+    } catch(err){
+        throw new Error(err);
+    }
+   
 }

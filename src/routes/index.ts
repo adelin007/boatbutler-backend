@@ -7,6 +7,7 @@ export const router = express.Router();
 // open
 router.post('/createUser', userController.postNewUser);
 router.post('/login', userController.postUserLoginDetails);
+router.post('/createMock', userController.postCreateMockData);
 //
 
 // protected

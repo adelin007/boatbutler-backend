@@ -1,11 +1,16 @@
 import { Request, Response } from 'express';
 import bodyParser from "body-parser";
 import { createNewUser, getAllUsers, createJWToken, createNewCompanyForUser } from "../services/userService";
+import { createFullDataMock } from "../services/mockData";
 import { BCRYPT_HASH_ROUND } from "../utils/definitions";
-import { UserInterface } from "../models/User";
+import { User, UserInterface, UserRole } from "../models/User";
 import Joi from 'joi';
 import bcrypt from "bcrypt";
 import { CompanyInterface } from '../models/Company';
+import { BoatInterface } from "../models/Boat";
+import { JobInterface } from "../models/Job";
+import { JobInviteInterface } from "../models/JobInvite"
+import { CreateQuery } from 'mongoose';
 
 
 export interface CreateNewUserInput {
@@ -82,6 +87,21 @@ interface GetUserDetailsResponse {
     city: UserInterface['city'];
     company: UserInterface['company']
 }
+
+// interface PostNewBoatInput {
+//     name: BoatInterface['name'];
+//     year: BoatInterface['year'];
+//     boat_type: BoatInterface['boat_type'];
+//     user_id: BoatInterface['user_id'];
+//     address: BoatInterface['address'];
+//     city: BoatInterface['city'];
+//     description: BoatInterface['description'];
+// }
+
+
+// interface PostNewBoatRequest extends Request{
+//     body: PostNewBoatInput
+// }
 
 export const postNewUser = async (req: CreateNewUserRequest, res: Response) => {
     try {
@@ -181,3 +201,33 @@ export const getUsers = async (req: Request, res: Response) => {
         res.status(400).send(err);
     }
 }
+
+export const postCreateMockData = async (req: Request, res: Response) => {
+    try {
+        const success = await createFullDataMock();
+        if (!success) {
+            throw new Error("Could not create mock data")
+        }
+
+        res.sendStatus(200);
+    } catch (err) {
+        console.log(err);
+        res.status(400).send(err);
+    }
+}
+
+// export const postNewBoat = async (req: PostNewBoatRequest, res: Response) => {
+//     try {
+//         const newBoatDetails = req.body;
+//         if(!newBoatDetails){
+//             throw new Error("Invalid boat details");
+//         }
+
+//         res.send(users);
+//     } catch (err) {
+//         console.log(err);
+//         res.status(400).send(err);
+//     }
+// }
+
+
