@@ -1,6 +1,6 @@
 import { Request, Response } from 'express';
 import bodyParser from "body-parser";
-import { createNewUser, getAllUsers, createJWToken, createNewCompanyForUser } from "../services/userService";
+import { createNewUser, getAllUsers, createJWToken, createNewCompanyForUser, getJobsForCompanyWithBoatDetails } from "../services/userService";
 import { createFullDataMock } from "../services/mockData";
 import { BCRYPT_HASH_ROUND } from "../utils/definitions";
 import { User, UserInterface, UserRole } from "../models/User";
@@ -8,7 +8,7 @@ import Joi from 'joi';
 import bcrypt from "bcrypt";
 import { CompanyInterface } from '../models/Company';
 import { BoatInterface } from "../models/Boat";
-import { JobInterface } from "../models/Job";
+import { Job, JobInterface } from "../models/Job";
 import { JobInviteInterface } from "../models/JobInvite"
 import { CreateQuery } from 'mongoose';
 
@@ -103,6 +103,11 @@ interface GetUserDetailsResponse {
 //     body: PostNewBoatInput
 // }
 
+interface GetWithUserRequest extends Request{
+    user: UserInterface;
+}
+
+
 export const postNewUser = async (req: CreateNewUserRequest, res: Response) => {
     try {
         const result = createNewUserValidationSchema.validate(req.body);
@@ -157,6 +162,7 @@ export const postNewUserCompany = async (req: CreateNewUserCompanyRequest, res: 
 export const postUserLoginDetails = async (req: UserLoginCredentials, res: Response) => {
     try {
         const { email, password } = req.body;
+        //TODO prevent normal users from logging in
         const jwToken = await createJWToken(email, password);
         if (!jwToken) {
             throw new Error("Could not create JWT");
@@ -187,7 +193,29 @@ export const getUserDetails = async (req: GetUserDetailsRequest, res: Response) 
         };
         return res.send(response);
     } catch (err) {
-
+        console.log(err);
+    }
+}
+export const getJobsForCompanyUser = async (req: GetWithUserRequest, res: Response) => {
+    try {
+        const user = req.user;
+        if (!user) {
+            throw new Error("User not found!")
+        }
+        const company = user.company;
+        if (!company) {
+            throw new Error("Company not found!")
+        }
+        const jobsForCompany = await getJobsForCompanyWithBoatDetails(company.id);
+        if(!jobsForCompany){
+            return res.send([]);
+        } else {
+            return res.send(jobsForCompany);
+        }
+      
+    } catch (err) {
+        console.log(err);
+        res.status(400).send(err);
     }
 }
 

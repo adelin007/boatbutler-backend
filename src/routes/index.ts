@@ -13,6 +13,8 @@ router.post('/createMock', userController.postCreateMockData);
 // protected
 router.get('/user/details', passport.authenticate("jwt", {session: false}), userController.getUserDetails);
 router.post('/company/new', passport.authenticate("jwt", {session: false}), userController.postNewUserCompany);
+router.get('/company/jobs', passport.authenticate("jwt", {session: false}), userController.getJobsForCompanyUser);
+
 ///
 
 router.get('/users', userController.getUsers);

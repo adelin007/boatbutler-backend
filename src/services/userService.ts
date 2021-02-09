@@ -1,5 +1,5 @@
 import {User, UserInterface} from "../models/User";
-import mongoose, {CreateQuery} from "mongoose";
+import mongoose, {CreateQuery, Types} from "mongoose";
 import { string } from "joi";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
@@ -68,7 +68,7 @@ export const getCompanyUserById = async(companyUserId: string) => {
     try{
         const objId = mongoose.Types.ObjectId(companyUserId);
         const userWithCompany = await User.findById(objId).populate('company');
-        console.log("USER WITH COMPANY: ", userWithCompany);
+        // console.log("USER WITH COMPANY: ", userWithCompany);
         if(!userWithCompany){
             throw new Error("User with company could not be found");
         }
@@ -102,6 +102,7 @@ export const getAllUsers = async() => {
 
 export const createJWToken = async(email: string, password: string) => {
     try{
+        //TODO prevent normal users from logging in
         const user = await getUserByEmail(email);
         if(!user){
             throw new Error("User not found")
@@ -148,4 +149,48 @@ export const createJobInvite= async(jobInvite: CreateQuery<JobInviteInterface>) 
         throw new Error(err);
     }
    
+}
+
+interface JobWithBoatDetails{
+    job: JobInterface;
+    boat: BoatInterface;
+    user_contact_details: string;
+}
+
+export const getJobsForCompanyWithBoatDetails = async(companyId: string) => {
+    try{
+        if(!companyId){
+            throw new Error("Missing companyId");
+        }
+        const jobs = await Job.find({awarded_company_id: companyId});
+        console.log("JOBS: ", jobs);
+        if(!jobs){
+            throw new Error("Could not find jobs");
+        }
+        console.log("COMPANYID: ", companyId)
+        // console.log("awardedCOmpany: ",Types.ObjectId(companyId).equals( Types.ObjectId("12123asf")) )
+        // const filteredJobsForCompany = jobs.filter(job => job.awarded_company_id === companyId);
+        // console.log("FILTERED OBZZ: ", filteredJobsForCompany);
+        const jobsForCompanyWithBoatDetails = await Promise.all(jobs.map(async(job) => {
+            const boatId = job.boat_id;
+            const boat = await Boat.findById(boatId);
+            const userId = boat.user_id;
+            const user = await User.findById(userId);
+            console.log("INNER USER: ", user)
+            if(!user){
+                throw new Error("Could not find user");
+            }
+            const result: JobWithBoatDetails={
+                job: job,
+                boat: boat,
+                user_contact_details: user.phone_number
+            };
+            return result;
+        }));
+    
+        return jobsForCompanyWithBoatDetails;
+    }catch(err){
+        throw new Error("Could not fetch jobs");
+    }
+ 
 }
