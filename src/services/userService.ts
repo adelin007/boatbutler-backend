@@ -8,8 +8,16 @@ import { Company, CompanyInterface } from "../models/Company";
 import {Job, JobInterface} from "../models/Job";
 import {Boat, BoatInterface} from "../models/Boat";
 import {JobInvite, JobInviteInterface} from "../models/JobInvite"
+import { Proposal, ProposalInterface, ProposalStatus } from "../models/Proposal";
 
-
+export interface ProposalDetails{
+    jobId: string;
+    date: string;
+    time: string;
+    text: string;
+    price: number;
+    fixedPrice: boolean;
+}
 
 export const createNewUser = async(user: CreateQuery<UserInterface>) => {
     try{
@@ -163,14 +171,9 @@ export const getJobsForCompanyWithBoatDetails = async(companyId: string) => {
             throw new Error("Missing companyId");
         }
         const jobs = await Job.find({awarded_company_id: companyId});
-        console.log("JOBS: ", jobs);
         if(!jobs){
             throw new Error("Could not find jobs");
         }
-        console.log("COMPANYID: ", companyId)
-        // console.log("awardedCOmpany: ",Types.ObjectId(companyId).equals( Types.ObjectId("12123asf")) )
-        // const filteredJobsForCompany = jobs.filter(job => job.awarded_company_id === companyId);
-        // console.log("FILTERED OBZZ: ", filteredJobsForCompany);
         const jobsForCompanyWithBoatDetails = await Promise.all(jobs.map(async(job) => {
             const boatId = job.boat_id;
             const boat = await Boat.findById(boatId);
@@ -193,4 +196,47 @@ export const getJobsForCompanyWithBoatDetails = async(companyId: string) => {
         throw new Error("Could not fetch jobs");
     }
  
+}
+
+export const createNewProposal = async(companyId: string, proposalDetails: ProposalDetails) => {
+    try{
+        if(!companyId || !proposalDetails){
+            throw new Error("invalid proposal details");
+        }
+        const proposalCreateQuery: CreateQuery<ProposalInterface> = {
+            description: proposalDetails.text,
+            job_id: proposalDetails.jobId,
+            time: proposalDetails.time,
+            date: proposalDetails.date,
+            negotiable: !proposalDetails.fixedPrice,
+            status: ProposalStatus.PENDING,
+            company_id: companyId 
+        }
+        const newProposal = await Proposal.create(proposalCreateQuery);
+        return newProposal;
+
+    }catch(err){
+        console.log(err);
+        throw new Error("Could not create proposal")
+    }
+        
+}
+
+export const getAllProposalsForCompany = async(companyId: string) => {
+    try{
+        if(!companyId){
+            throw new Error("invalid companyId");
+        }
+        const allProposals =  await Proposal.find({company_id: companyId});
+        if(!allProposals){
+            throw new Error("Could not find proposals");
+        }
+
+        return allProposals;
+
+    }catch(err){
+        console.log(err);
+        throw new Error("Could not create proposal")
+    }
+        
 }

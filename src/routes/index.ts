@@ -14,6 +14,8 @@ router.post('/createMock', userController.postCreateMockData);
 router.get('/user/details', passport.authenticate("jwt", {session: false}), userController.getUserDetails);
 router.post('/company/new', passport.authenticate("jwt", {session: false}), userController.postNewUserCompany);
 router.get('/company/jobs', passport.authenticate("jwt", {session: false}), userController.getJobsForCompanyUser);
+router.post('/company/proposals/new', passport.authenticate("jwt", {session: false}), userController.postNewProposal);
+router.get('/company/proposals', passport.authenticate("jwt", {session: false}), userController.getAllProposals);
 
 ///
 

@@ -12,6 +12,7 @@ const ProposalSchema = new mongoose.Schema({
         type: String,
         enum: ProposalStatus
     },
+    price: Number,
     date: String,
     time: String,
     description: String,
@@ -26,8 +27,9 @@ export interface ProposalInterface extends Document{
     time: string;
     description: string;
     negotiable: boolean;
-    job_id: Schema.Types.ObjectId, 
-    company_id: Schema.Types.ObjectId, 
+    job_id: string, 
+    company_id: string, 
+    price: number;
 }
 
 export const Proposal = mongoose.model<ProposalInterface>('Proposal', ProposalSchema);

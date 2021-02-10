@@ -30,7 +30,7 @@ passport.use(new JwtStrategy(opts, async(jwtPayload: JWTPayload, callback) => {
         // }
 
         // restrict normal Users from accessing company web portal
-        return callback("NOT A COMPANY USER");
+        return callback(null, false, "NOT A COMPANY USER");
 
     } else if(jwtPayload.user_role === UserRole.COMPANY){
         try{

@@ -1,6 +1,6 @@
 import { Request, Response } from 'express';
 import bodyParser from "body-parser";
-import { createNewUser, getAllUsers, createJWToken, createNewCompanyForUser, getJobsForCompanyWithBoatDetails } from "../services/userService";
+import { createNewUser, getAllUsers, createJWToken, createNewCompanyForUser, getJobsForCompanyWithBoatDetails, createNewProposal, ProposalDetails, getAllProposalsForCompany } from "../services/userService";
 import { createFullDataMock } from "../services/mockData";
 import { BCRYPT_HASH_ROUND } from "../utils/definitions";
 import { User, UserInterface, UserRole } from "../models/User";
@@ -10,6 +10,7 @@ import { CompanyInterface } from '../models/Company';
 import { BoatInterface } from "../models/Boat";
 import { Job, JobInterface } from "../models/Job";
 import { JobInviteInterface } from "../models/JobInvite"
+import {ProposalInterface, ProposalStatus} from "../models/Proposal";
 import { CreateQuery } from 'mongoose';
 
 
@@ -87,25 +88,31 @@ interface GetUserDetailsResponse {
     city: UserInterface['city'];
     company: UserInterface['company']
 }
-
-// interface PostNewBoatInput {
-//     name: BoatInterface['name'];
-//     year: BoatInterface['year'];
-//     boat_type: BoatInterface['boat_type'];
-//     user_id: BoatInterface['user_id'];
-//     address: BoatInterface['address'];
-//     city: BoatInterface['city'];
-//     description: BoatInterface['description'];
-// }
-
-
-// interface PostNewBoatRequest extends Request{
-//     body: PostNewBoatInput
-// }
-
 interface GetWithUserRequest extends Request{
     user: UserInterface;
 }
+
+interface NewProposalRequest extends Request{
+    body: ProposalDetails;
+    user: UserInterface;
+}
+
+interface GetAllProposalsRequest extends Request{
+    user: UserInterface;
+}
+
+interface GetAllProposalsResponseItem{
+    id: ProposalInterface['id'];
+    status: ProposalInterface['status'];
+    date: ProposalInterface['date'];
+    time: ProposalInterface['time'];
+    description: ProposalInterface['description'];
+    negotiable: ProposalInterface['negotiable'];
+    job_id: ProposalInterface['job_id'], 
+    company_id: ProposalInterface['company_id'], 
+    price: ProposalInterface['price']
+}
+
 
 
 export const postNewUser = async (req: CreateNewUserRequest, res: Response) => {
@@ -243,6 +250,70 @@ export const postCreateMockData = async (req: Request, res: Response) => {
         res.status(400).send(err);
     }
 }
+
+
+export const postNewProposal = async(req: NewProposalRequest, res: Response) => {
+    try{
+ 
+        const {user} = req;
+        if(!user && !user.company){
+            throw new Error("Invalid user");
+        }
+        const companyId = user.company.id;
+        if(!companyId){
+            throw new Error("Invalid company");
+        }
+        const proposalDetails = req.body;
+        if(!proposalDetails){
+            throw new Error("Invalid proposal Details");
+        }
+        const newProposal = await createNewProposal(companyId, proposalDetails);
+        if(!newProposal){
+           throw new Error("Could not create new proposal")
+        } else {
+            return res.sendStatus(200);
+        }
+    }catch(err){
+        console.log(err);
+        return res.status(400).send(err);
+    }
+}
+
+export const getAllProposals = async(req: GetAllProposalsRequest, res: Response) => {
+    try{
+ 
+        const {user} = req;
+        if(!user){
+            throw new Error("Invalid user");
+        }
+        const companyId = user.company.id;
+        if(!companyId){
+            throw new Error("Invalid company");
+        }
+       
+        const allProposals = await getAllProposalsForCompany(companyId);
+        const response: GetAllProposalsResponseItem[] = allProposals.map(proposal => {
+            const resItem: GetAllProposalsResponseItem = {
+                id: proposal.id,
+                description: proposal.description,
+                status: proposal.status,
+                date: proposal.date,
+                time: proposal.time,
+                job_id: proposal.job_id,
+                negotiable: proposal.negotiable,
+                company_id: proposal.company_id,
+                price: proposal.price
+            }
+            return resItem;
+        })
+        return res.send(response);
+    
+    }catch(err){
+        console.log(err);
+        return res.status(400).send(err);
+    }
+}
+
 
 // export const postNewBoat = async (req: PostNewBoatRequest, res: Response) => {
 //     try {
