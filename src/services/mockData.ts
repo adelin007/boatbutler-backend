@@ -1,5 +1,5 @@
-import {User, UserInterface, UserRole} from "../models/User";
-import mongoose, {CreateQuery} from "mongoose";
+import { User, UserInterface, UserRole } from "../models/User";
+import mongoose, { CreateQuery } from "mongoose";
 import { string } from "joi";
 import bcrypt from "bcrypt";
 import { BCRYPT_HASH_ROUND } from "../utils/definitions";
@@ -7,17 +7,17 @@ import jwt from "jsonwebtoken";
 import { JWT_SECRET } from "../utils/definitions";
 import { Company, CompanyInterface } from "../models/Company";
 
-import {Job, JobCategory, JobInterface, JobMediaInterface, JobSubCategory, MediaType} from "../models/Job";
-import {Boat, BoatInterface, BoatType} from "../models/Boat";
-import {JobInvite, JobInviteInterface} from "../models/JobInvite"
-import {createJob, createJobInvite, createNewUser, getUserById} from "./userService";
+import { Job, JobCategory, JobInterface, JobMediaInterface, JobSubCategory, MediaType } from "../models/Job";
+import { Boat, BoatInterface, BoatType } from "../models/Boat";
+import { JobInvite, JobInviteInterface } from "../models/JobInvite"
+import { createJob, createJobInvite, createNewUser, getUserById } from "./userService";
 
 
 
-export const createUserMock = async() => {
-    try{
-        const pass =  await bcrypt.hash("john123", BCRYPT_HASH_ROUND);
-        if(!pass){
+export const createUserMock = async () => {
+    try {
+        const pass = await bcrypt.hash("john123", BCRYPT_HASH_ROUND);
+        if (!pass) {
             throw new Error("Password could not be hashed");
         }
         const newUserData: CreateQuery<UserInterface> = {
@@ -35,22 +35,22 @@ export const createUserMock = async() => {
             phone_number: "12345"
         }
         const newUser = await createNewUser(newUserData);
-        if(!newUser){
+        if (!newUser) {
             throw new Error("User could not be created");
         }
         return newUser;
-        
-    }catch(err){
+
+    } catch (err) {
         console.log(err);
     }
 
 
 }
 
-export const createCompanyUserMock = async() => {
-    try{
-        const pass =  await bcrypt.hash("company123", BCRYPT_HASH_ROUND);
-        if(!pass){
+export const createCompanyUserMock = async () => {
+    try {
+        const pass = await bcrypt.hash("company123", BCRYPT_HASH_ROUND);
+        if (!pass) {
             throw new Error("Password could not be hashed");
         }
         const newUserData: CreateQuery<UserInterface> = {
@@ -68,7 +68,7 @@ export const createCompanyUserMock = async() => {
             phone_number: "889900",
         }
         const newUser = await createNewUser(newUserData);
-        if(!newUser){
+        if (!newUser) {
             throw new Error("User could not be created");
         }
         const newCompanyData: CreateQuery<CompanyInterface> = {
@@ -83,31 +83,31 @@ export const createCompanyUserMock = async() => {
             logo_image_url: ""
         }
         const company = await Company.create(newCompanyData);
-        if(!company){
+        if (!company) {
             throw new Error("Could not create company");
         }
         newUser.company = company;
         const savedUserWithCompany = await newUser.save();
-        if(!savedUserWithCompany){
+        if (!savedUserWithCompany) {
             throw new Error("Could not save user with company");
         }
         const fullUserWithCompany = await User.findById(savedUserWithCompany.id).populate('company');
         return fullUserWithCompany;
-        
-    }catch(err){
+
+    } catch (err) {
         console.log(err);
     }
 
 }
 
 
-export const createBoatMock = async(userId: string) => {
-    try{
-        if(!userId){
+export const createBoatMock = async (userId: string) => {
+    try {
+        if (!userId) {
             throw new Error("Missing userId");
         }
         const user = await getUserById(userId);
-        if(!user){
+        if (!user) {
             throw new Error("Could not find user");
         }
         const newBoatData: CreateQuery<BoatInterface> = {
@@ -120,125 +120,125 @@ export const createBoatMock = async(userId: string) => {
             user_id: user.id
         }
         const newBoat = await Boat.create(newBoatData);
-        if(!newBoat){
+        if (!newBoat) {
             throw new Error("Boat could not be created");
         }
         return newBoat;
-        
-    }catch(err){
+
+    } catch (err) {
         console.log(err);
     }
 
 }
 
-export const createJobInviteMock = async(jobId: string, companyId: string) => {
-    try{
-        if(!jobId || !companyId){
+export const createJobInviteMock = async (jobId: string, companyId: string) => {
+    try {
+        if (!jobId || !companyId) {
             throw new Error("Invalid input");
         }
         const job = await Job.findById(jobId);
-        if(!job){
+        if (!job) {
             throw new Error("Could not find Job");
         }
         const company = await Company.findById(companyId);
-        if(!company){
+        if (!company) {
             throw new Error("Could not find Company");
         }
-        
+
         const newJobInviteData: CreateQuery<JobInviteInterface> = {
-           job_id: job.id,
-           company_id: company.id
+            job_id: job.id,
+            company_id: company.id
         }
         const newJobInvite = await JobInvite.create(newJobInviteData);
-        if(!newJobInvite){
+        if (!newJobInvite) {
             throw new Error("JobInvite could not be created");
         }
         return newJobInvite;
-        
-    }catch(err){
+
+    } catch (err) {
         console.log(err);
     }
 
 }
 
-export const createJobMock = async(userId: string, boatId: string, awarded_company_id: string) => {
-    try{
-        if(!userId || !boatId || !awarded_company_id){
+export const createJobMock = async (userId: string, boatId: string, awarded_company_id: string, iterator: number) => {
+    try {
+        if (!userId || !boatId || !awarded_company_id) {
             throw new Error("Invalid inputs");
         }
         const user = await getUserById(userId);
-        if(!user){
+        if (!user) {
             throw new Error("Could not find user");
         }
 
         const boat = await Boat.findById(boatId);
-        if(!boat){
-            throw new Error("Could not find boat"); 
+        if (!boat) {
+            throw new Error("Could not find boat");
         }
 
         const company = await Company.findById(awarded_company_id);
-        if(!company){
-            throw new Error("Could not find company"); 
+        if (!company) {
+            throw new Error("Could not find company");
         }
-        
-        // const newJobMedia: CreateQuery<JobMediaInterface> = {
-        //     type: MediaType.IMAGE,
-        //     url: "https://images.unsplash.com/photo-1511311855362-67f5492671ab?ixlib=rb-1.2.1&ixid=MXwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHw%3D&auto=format&fit=crop&w=1650&q=80",
-        //     job_id
 
-        // }
+        const imageURL = ((iterator % 2 === 0) ?
+            "https://images.unsplash.com/photo-1575893240675-17e719ffa7c5?ixid=MXwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHw%3D&ixlib=rb-1.2.1&auto=format&fit=crop&w=1000&q=80" :
+            "https://images.unsplash.com/photo-1511311855362-67f5492671ab?ixlib=rb-1.2.1&ixid=MXwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHw%3D&auto=format&fit=crop&w=1650&q=80"
+        )
 
         const newJobData: CreateQuery<JobInterface> = {
             user_id: user.id,
             awarded_company_id: company.id,
             category: JobCategory.A,
             subcategory: JobSubCategory.SUB_A,
-            description: "I need to fix the engine",
+            description: `Fix ${(Math.random() + 1).toString(36).substr(1, 6)}`,
             allow_contact_by_app: true,
             job_media: [{
-                url: "https://images.unsplash.com/photo-1511311855362-67f5492671ab?ixlib=rb-1.2.1&ixid=MXwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHw%3D&auto=format&fit=crop&w=1650&q=80",
+                url: imageURL,
                 type: MediaType.IMAGE,
             }],
-            lat: 55.6,
-            lng: 12.5,
+            lat: 55.6 + Math.floor(Math.random() * 10),
+            lng: 12.5 + Math.floor(Math.random() * 10),
             is_emergency: true,
             is_done: false,
-            title: "Engine Repair Speedboat",
-            price: 5000,
+            title: `Job no ${Math.floor(Math.random() * 100)}`,
+            price: 5000 + Math.floor(Math.random() * 100),
             due_date: new Date(Date.now()).toDateString(),
             due_time: "15:00:00",
             boat_id: boat.id
 
         }
         const newJob = await Job.create(newJobData);
-        if(!newJob){
+        if (!newJob) {
             throw new Error("Job could not be created");
         }
         return newJob;
-        
-    }catch(err){
+
+    } catch (err) {
         console.log(err);
     }
 
 }
 
 
-export const createFullDataMock = async() => {
-    try{
+export const createFullDataMock = async () => {
+    try {
+        // wipe database before creating new mock data
         const collections = await mongoose.connection.db.collections();
-        for(let collection of collections){
+        for (let collection of collections) {
             await collection.deleteMany({});
         }
-        
         const user = await createUserMock();
         const userWithCompany = await createCompanyUserMock();
         const boat = await createBoatMock(user.id);
-        const job = await createJobMock(user.id, boat.id, userWithCompany.company.id);
-        const jobInvite = await createJobInviteMock(job.id, userWithCompany.company.id);
-
-        return true;
         
-    }catch(err){
+        for(let i= 0; i< 3; i++){
+            const job = await createJobMock(user.id, boat.id, userWithCompany.company.id, i);
+            const jobInvite = await createJobInviteMock(job.id, userWithCompany.company.id);
+        }
+        return true;
+
+    } catch (err) {
         console.log(err);
         return false;
     }

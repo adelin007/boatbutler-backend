@@ -15,23 +15,10 @@ interface JWTPayload{
     user_role: UserInterface['user_role']
 }
 passport.use(new JwtStrategy(opts, async(jwtPayload: JWTPayload, callback) => {
-    //TODO restrict normal users from accessing the platform, only company users should be able to
     if(jwtPayload.user_role === UserRole.USER){
-        // try{
-        //     const user = await getUserById(jwtPayload.user_id);
-        //     if(!user){
-        //           throw new Error("Could not find user");
-        //     } 
-        //     return callback(null, user);
-          
-            
-        // }catch(err){
-        //     return callback(err);
-        // }
 
-        // restrict normal Users from accessing company web portal
         return callback(null, false, "NOT A COMPANY USER");
-
+        
     } else if(jwtPayload.user_role === UserRole.COMPANY){
         try{
             const user = await getCompanyUserById(jwtPayload.user_id);
@@ -40,7 +27,6 @@ passport.use(new JwtStrategy(opts, async(jwtPayload: JWTPayload, callback) => {
             } 
             return callback(null, user);
           
-            
         }catch(err){
             return callback(err);
         }

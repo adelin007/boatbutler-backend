@@ -27,8 +27,8 @@ export interface ProposalInterface extends Document{
     time: string;
     description: string;
     negotiable: boolean;
-    job_id: string, 
-    company_id: string, 
+    job_id: string;
+    company_id: string; 
     price: number;
 }
 

@@ -1,18 +1,12 @@
 import { Request, Response } from 'express';
-import bodyParser from "body-parser";
 import { createNewUser, getAllUsers, createJWToken, createNewCompanyForUser, getJobsForCompanyWithBoatDetails, createNewProposal, ProposalDetails, getAllProposalsForCompany } from "../services/userService";
 import { createFullDataMock } from "../services/mockData";
 import { BCRYPT_HASH_ROUND } from "../utils/definitions";
-import { User, UserInterface, UserRole } from "../models/User";
+import {UserInterface } from "../models/User";
 import Joi from 'joi';
 import bcrypt from "bcrypt";
 import { CompanyInterface } from '../models/Company';
-import { BoatInterface } from "../models/Boat";
-import { Job, JobInterface } from "../models/Job";
-import { JobInviteInterface } from "../models/JobInvite"
-import {ProposalInterface, ProposalStatus} from "../models/Proposal";
-import { CreateQuery } from 'mongoose';
-
+import {ProposalInterface} from "../models/Proposal";
 
 export interface CreateNewUserInput {
     profile_pic: UserInterface['profile_pic'];
@@ -24,20 +18,13 @@ export interface CreateNewUserInput {
     address: UserInterface['address'];
     zip_code: UserInterface['zip_code'];
     city: UserInterface['city'];
-    // created_at: UserInterface['created_at'];
-    // updated_at: UserInterface['updated_at'];
-    // active: UserInterface['active']; 
 }
 export interface CreateNewUserCompanyInput {
     name: CompanyInterface['name'];
     lat: CompanyInterface['lat'];
     lng: CompanyInterface['lng'];
-    // user_id: CompanyInterface['user_id'];
     logo_image_url: CompanyInterface['logo_image_url'];
     cvr: CompanyInterface['cvr'];
-    // is_paid: CompanyInterface['is_paid'];
-    // is_enabled: CompanyInterface['is_enabled'];
-    // is_visible: CompanyInterface['is_visible'];
 }
 
 interface CreateNewUserRequest extends Request {
@@ -114,7 +101,6 @@ interface GetAllProposalsResponseItem{
 }
 
 
-
 export const postNewUser = async (req: CreateNewUserRequest, res: Response) => {
     try {
         const result = createNewUserValidationSchema.validate(req.body);
@@ -163,13 +149,11 @@ export const postNewUserCompany = async (req: CreateNewUserCompanyRequest, res: 
 
     }
 
-
 }
 
 export const postUserLoginDetails = async (req: UserLoginCredentials, res: Response) => {
     try {
         const { email, password } = req.body;
-        //TODO prevent normal users from logging in
         const jwToken = await createJWToken(email, password);
         if (!jwToken) {
             throw new Error("Could not create JWT");
@@ -313,20 +297,4 @@ export const getAllProposals = async(req: GetAllProposalsRequest, res: Response)
         return res.status(400).send(err);
     }
 }
-
-
-// export const postNewBoat = async (req: PostNewBoatRequest, res: Response) => {
-//     try {
-//         const newBoatDetails = req.body;
-//         if(!newBoatDetails){
-//             throw new Error("Invalid boat details");
-//         }
-
-//         res.send(users);
-//     } catch (err) {
-//         console.log(err);
-//         res.status(400).send(err);
-//     }
-// }
-
 

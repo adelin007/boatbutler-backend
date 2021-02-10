@@ -28,8 +28,6 @@ export const createNewUser = async(user: CreateQuery<UserInterface>) => {
     } catch(err){
         throw new Error(err);
     }
-   
-
 }
 
 export const createNewCompanyForUser = async(company: CreateQuery<CompanyInterface>) => {
@@ -57,26 +55,22 @@ export const createNewCompanyForUser = async(company: CreateQuery<CompanyInterfa
         throw new Error(err);
     }
    
-
 }
 
 
 export const getUserById = async(userId: string) => {
     try{
         const objId = mongoose.Types.ObjectId(userId);
-        console.log("ID IZ: ", objId)
         return await User.findById(objId);
     } catch(err){
         throw new Error(err);
     }
-   
 
 }
 export const getCompanyUserById = async(companyUserId: string) => {
     try{
         const objId = mongoose.Types.ObjectId(companyUserId);
         const userWithCompany = await User.findById(objId).populate('company');
-        // console.log("USER WITH COMPANY: ", userWithCompany);
         if(!userWithCompany){
             throw new Error("User with company could not be found");
         }
@@ -85,7 +79,6 @@ export const getCompanyUserById = async(companyUserId: string) => {
         throw new Error(err);
     }
    
-
 }
 
 export const getUserByEmail = async(email: string) => {
@@ -94,11 +87,7 @@ export const getUserByEmail = async(email: string) => {
     } catch(err){
         throw new Error(err);
     }
-   
-
 }
-
-
 
 export const getAllUsers = async() => {
     try{
@@ -110,7 +99,6 @@ export const getAllUsers = async() => {
 
 export const createJWToken = async(email: string, password: string) => {
     try{
-        //TODO prevent normal users from logging in
         const user = await getUserByEmail(email);
         if(!user){
             throw new Error("User not found")
@@ -136,10 +124,7 @@ export const addBoat = async(boat: CreateQuery<BoatInterface>) => {
     } catch(err){
         throw new Error(err);
     }
-   
-
 }
-
 
 export const createJob = async(job: CreateQuery<JobInterface>) => {
     try{
@@ -147,7 +132,6 @@ export const createJob = async(job: CreateQuery<JobInterface>) => {
     } catch(err){
         throw new Error(err);
     }
-   
 }
 
 export const createJobInvite= async(jobInvite: CreateQuery<JobInviteInterface>) => {
@@ -156,7 +140,6 @@ export const createJobInvite= async(jobInvite: CreateQuery<JobInviteInterface>) 
     } catch(err){
         throw new Error(err);
     }
-   
 }
 
 interface JobWithBoatDetails{
@@ -210,7 +193,8 @@ export const createNewProposal = async(companyId: string, proposalDetails: Propo
             date: proposalDetails.date,
             negotiable: !proposalDetails.fixedPrice,
             status: ProposalStatus.PENDING,
-            company_id: companyId 
+            company_id: companyId,
+            price: proposalDetails.price 
         }
         const newProposal = await Proposal.create(proposalCreateQuery);
         return newProposal;
