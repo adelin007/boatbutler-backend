@@ -1,18 +1,13 @@
 import { User, UserInterface, UserRole } from "../models/User";
 import mongoose, { CreateQuery } from "mongoose";
-import { string } from "joi";
 import bcrypt from "bcrypt";
 import { BCRYPT_HASH_ROUND } from "../utils/definitions";
-import jwt from "jsonwebtoken";
-import { JWT_SECRET } from "../utils/definitions";
 import { Company, CompanyInterface } from "../models/Company";
 
 import { Job, JobCategory, JobInterface, JobMediaInterface, JobSubCategory, MediaType } from "../models/Job";
 import { Boat, BoatInterface, BoatType } from "../models/Boat";
 import { JobInvite, JobInviteInterface } from "../models/JobInvite"
 import { createJob, createJobInvite, createNewUser, getUserById } from "./userService";
-
-
 
 export const createUserMock = async () => {
     try {
@@ -43,7 +38,6 @@ export const createUserMock = async () => {
     } catch (err) {
         console.log(err);
     }
-
 
 }
 
@@ -99,7 +93,6 @@ export const createCompanyUserMock = async () => {
     }
 
 }
-
 
 export const createBoatMock = async (userId: string) => {
     try {
@@ -219,7 +212,6 @@ export const createJobMock = async (userId: string, boatId: string, awarded_comp
     }
 
 }
-
 
 export const createFullDataMock = async () => {
     try {

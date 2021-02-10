@@ -25,7 +25,6 @@ app.use(function (err: Error, req: Request, res: Response, next: NextFunction) {
     res.status(500).send('Something broke!')
   })
 
-
 app.use('/api', router);
 
 

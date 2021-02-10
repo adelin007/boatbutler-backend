@@ -8,6 +8,8 @@ export const router = express.Router();
 router.post('/createUser', userController.postNewUser);
 router.post('/login', userController.postUserLoginDetails);
 router.post('/createMock', userController.postCreateMockData);
+// for testing
+router.get('/users', userController.getUsers);
 //
 
 // protected
@@ -16,8 +18,6 @@ router.post('/company/new', passport.authenticate("jwt", {session: false}), user
 router.get('/company/jobs', passport.authenticate("jwt", {session: false}), userController.getJobsForCompanyUser);
 router.post('/company/proposals/new', passport.authenticate("jwt", {session: false}), userController.postNewProposal);
 router.get('/company/proposals', passport.authenticate("jwt", {session: false}), userController.getAllProposals);
-
 ///
 
-router.get('/users', userController.getUsers);
-// router.get('/users', )
+
